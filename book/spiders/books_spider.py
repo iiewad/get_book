@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import scrapy
 import json
 
@@ -26,13 +28,14 @@ class Books(scrapy.Spider):
         chapters = details.css('ol>li')
 
         for c_list in chapters:
-            # c_link = c_list.css('a::text').extract_first()
             c_link = c_list.css('a::attr(href)').extract_first()
             yield response.follow(c_link, callback=self.parse_chapter)
 
     def parse_chapter(self, response):
         title = response.css('h1::text').extract_first()
-        content = response.css('div#content::text').extract()
+        content = response.xpath('//*[@id="content"]/p/text()').extract()
 
-        print(title)
-        print(title)
+        yield {
+            'title': title,
+            'content': content
+        }
